@@ -5,21 +5,20 @@
 // will compile your contracts, add the Hardhat Runtime Environment's members to the
 // global scope, and execute the script.
 const hre = require("hardhat");
+require("dotenv").config();
+const {WHITELIST_CONTRACT_ADDRESS,METADATA_URL} = require("../Constant");
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
+
 
   const lockedAmount = hre.ethers.utils.parseEther("1");
+  const CryptoNFT = await hre.ethers.getContractFactory("CryptoNFT");
+  const cryptoNFT = await CryptoNFT.deploy(`${METADATA_URL}`, `${WHITELIST_CONTRACT_ADDRESS}`);
 
-  const Lock = await hre.ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
-
-  await lock.deployed();
+  await cryptoNFT.deployed();
 
   console.log(
-    `Lock with 1 ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`
+    "CryptoNFT address is:", cryptoNFT.address, 
   );
 }
 
